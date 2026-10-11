@@ -1,0 +1,9 @@
+{
+  "name": "Orakel Münzwurf",
+  "short_name": "Münzwurf",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050b06",
+  "theme_color": "#050b06",
+  "orientation": "portrait"
+}
