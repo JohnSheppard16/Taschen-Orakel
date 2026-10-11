@@ -1,21 +1,26 @@
 {
-  "name": "Orakel Münzwurf",
-  "short_name": "Münzwurf",
-  "start_url": "./index.html",
+  "name": "Das goldene Orakel",
+  "short_name": "Orakel",
+  "description": "Interaktive Fantasy-Ja-Nein-Orakel-Anwendung mit animierter Goldmünze und stimmungsvollen Themenwelten.",
+  "start_url": "./oracle.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#050b06",
-  "theme_color": "#050b06",
-  "orientation": "portrait",
+  "orientation": "portrait-primary",
+  "background_color": "#05130b",
+  "theme_color": "#0d2b1a",
+  "lang": "de",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/862/862873.png",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/862/862873.png",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
