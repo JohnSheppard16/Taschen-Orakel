@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Orakel Münzwurf</title>
-  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#050b06">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -88,6 +87,16 @@
       display: flex; flex-direction: column; align-items: center;
       z-index: 20; padding: 0 20px; gap: 14px;
     }
+    #message-overlay {
+      position: absolute; top: 22%; left: 0; right: 0;
+      text-align: center; z-index: 25; pointer-events: none;
+      opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .main-msg {
+      font-size: 20px; font-weight: 800; letter-spacing: 2px;
+      text-transform: uppercase; text-shadow: 0 2px 6px #000;
+    }
+    .sub-msg { font-family: 'MedievalSharp', serif; font-size: 16px; color: #dfd7c2; margin-top: 6px; text-shadow: 0 2px 4px #000; }
     #toss-btn {
       position: relative; width: 85%; max-width: 310px; height: 60px;
       background: linear-gradient(180deg, #443e34 0%, #2d2820 40%, #1e1b15 100%);
@@ -114,6 +123,11 @@
   <div id="stage">
     <canvas id="bg-canvas"></canvas>
     <canvas id="particle-canvas"></canvas>
+    
+    <div id="message-overlay">
+      <div class="main-msg" id="main-msg"></div>
+      <div class="sub-msg" id="sub-msg"></div>
+    </div>
 
     <div class="top-bar">
       <div class="counters">
@@ -165,6 +179,9 @@
     const pCanvas = document.getElementById('particle-canvas');
     const pCtx = pCanvas.getContext('2d');
     const audioBtn = document.getElementById('audio-toggle');
+    const messageOverlay = document.getElementById('message-overlay');
+    const mainMsg = document.getElementById('main-msg');
+    const subMsg = document.getElementById('sub-msg');
 
     audioBtn.addEventListener('click', () => {
       soundEnabled = !soundEnabled;
@@ -176,18 +193,38 @@
       try {
         if (Tone.context.state !== 'running') Tone.start();
         if (type === 'flip') {
-          const osc = new Tone.Oscillator(1600, "triangle").toDestination();
-          osc.volume.value = -12; osc.start(); osc.stop("+0.08");
+          const osc = new Tone.Oscillator(1400, "sine").toDestination();
+          osc.volume.value = -14; osc.start(); osc.stop("+0.07");
         } else if (type === 'ja') {
           const synth = new Tone.PolySynth(Tone.Synth).toDestination();
+          synth.set({
+            oscillator: { type: "sine" },
+            envelope: { attack: 0.08, decay: 0.3, sustain: 0.6, release: 1.8 }
+          });
           synth.volume.value = -8;
-          synth.triggerAttackRelease(["E5", "B5", "E6"], "0.3");
+          synth.triggerAttackRelease(["C4", "E4", "G4", "C5"], "2n");
         } else if (type === 'nein') {
           const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-          synth.volume.value = -7;
-          synth.triggerAttackRelease(["G3", "C4", "Eb4"], "0.35");
+          synth.set({
+            oscillator: { type: "triangle" },
+            envelope: { attack: 0.1, decay: 0.4, sustain: 0.5, release: 1.6 }
+          });
+          synth.volume.value = -8;
+          synth.triggerAttackRelease(["C3", "G3", "Eb4"], "2n");
         }
       } catch (e) {}
+    }
+
+    function showMessage(isJa) {
+      mainMsg.textContent = isJa ? "Die Götter haben entschieden" : "Das Schicksal hat gesprochen";
+      subMsg.textContent = isJa ? "Die Antwort lautet: JA" : "Die Antwort lautet: NEIN";
+      mainMsg.style.color = isJa ? "#1fe56c" : "#ff505a";
+      messageOverlay.style.opacity = '1';
+      messageOverlay.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        messageOverlay.style.opacity = '0';
+        messageOverlay.style.transform = 'translateY(20px)';
+      }, 3200);
     }
 
     function resizeCanvases() {
@@ -412,11 +449,13 @@
             valJa.textContent = jaCount;
             playSound('ja');
             createBurst(true);
+            showMessage(true);
           } else {
             neinCount++;
             valNein.textContent = neinCount;
             playSound('nein');
             createBurst(false);
+            showMessage(false);
           }
 
           isFlipping = false;
@@ -432,12 +471,6 @@
     resizeCanvases();
     renderCoinFace('JA');
     requestAnimationFrame(updateParticles);
-
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
-      });
-    }
   </script>
 </body>
 </html>
